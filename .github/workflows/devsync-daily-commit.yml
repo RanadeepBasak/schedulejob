@@ -1,0 +1,29 @@
+name: Daily DevSync Commit
+
+on:
+  schedule:
+    - cron: '10 4 * * *'  # Runs every day at 4:10 AM UTC
+  workflow_dispatch:       # Optional: manual trigger
+
+jobs:
+  daily-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Update daily_status.txt (22f3000940@ds.study.iitm.ac.in)
+        run: |
+          echo "Last updated at $(date -u)" >> daily_status.txt
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "22f3000940@ds.study.iitm.ac.in"
+          git add daily_status.txt
+          git commit -m "Daily update: $(date -u)" || echo "No changes to commit"
+          git push
+        env:
+          # Required to push back to the repository
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
