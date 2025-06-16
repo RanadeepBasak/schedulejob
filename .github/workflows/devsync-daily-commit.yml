@@ -1,17 +1,9 @@
-- name: Commit and Push Changes
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  run: |
-    git config --global user.name "github-actions"
-    git config --global user.email "22f3000940@ds.study.iitm.ac.in"
-    git add daily_status.txt
-    git commit -m "Daily update: $(date -u)" || echo "No changes to commit"
-    git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} HEAD:main
+name: Daily DevSync Commit
 
 on:
   schedule:
-    - cron: '10 4 * * *'  # Runs every day at 4:10 AM UTC
-  workflow_dispatch:       # Optional: manual trigger
+    - cron: '10 4 * * *'  # Runs daily at 4:10 AM UTC
+  workflow_dispatch:       # Allows manual run
 
 jobs:
   daily-commit:
@@ -26,12 +18,11 @@ jobs:
           echo "Last updated at $(date -u)" >> daily_status.txt
 
       - name: Commit and Push Changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "22f3000940@ds.study.iitm.ac.in"
           git add daily_status.txt
           git commit -m "Daily update: $(date -u)" || echo "No changes to commit"
-          git push
-        env:
-          # Required to push back to the repository
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} HEAD:main
